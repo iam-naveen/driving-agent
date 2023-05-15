@@ -118,11 +118,11 @@ vehicle.addWheel({
 
 vehicle.addToWorld(physicsWorld);
 
+const maxSteerVal = Math.PI / 8;
+const maxForce = 30;
+
 // move car based on user input
 document.addEventListener("keydown", (event) => {
-  const maxSteerVal = Math.PI / 8;
-  const maxForce = 30;
-
   switch (event.key) {
     case "w":
     case "ArrowUp":
@@ -236,7 +236,6 @@ const grid = [
   [1, 0, 1, 0, 1, 0, 1, 0, 1],
   [0, 0, 0, 1, 0, 0, 0, 1, 0],
 ];
-
 // Set obstacles based on the grid
 let obstacleCount = 0;
 for (let i = 0; i < grid.length; i++) {
@@ -268,17 +267,6 @@ for (let i = 0; i < grid.length; i++) {
 }
 
 const debug_enabled = true;
-
-const detectBox = (box: any) => {
-  box.object.material.color.set("black");
-};
-const resetBoxes = () => {
-  obstacleMeshes.forEach((box: any) => {
-    box.material.color.set("red");
-  });
-  leftwallMesh.material.color.set("blue");
-  rightwallMesh.material.color.set("red");
-};
 
 const numberOfRays = 10;
 const rayLength = 50;
@@ -358,6 +346,24 @@ const drawCar = () => {
   sphereMesh4.quaternion.copy(wheelBody4.quaternion as any);
 };
 
+let isDamaged = false;
+// Funtion to detect whether the car collided the obstacles
+function isColliding(): void {
+  const box = new THREE.Box3().setFromObject(boxMesh);
+  const leftWall = new THREE.Box3().setFromObject(leftwallMesh);
+  const rightWall = new THREE.Box3().setFromObject(rightwallMesh);
+  for (let obstacle of obstacleMeshes) {
+    const obstacleBox = new THREE.Box3().setFromObject(obstacle);
+    if (
+      box.intersectsBox(obstacleBox) ||
+      box.intersectsBox(leftWall) ||
+      box.intersectsBox(rightWall)
+    ) {
+      isDamaged = true;
+    }
+  }
+}
+
 const setCameraFollow = () => {
   frame.camera.lookAt(
     boxMesh.position.x,
@@ -371,6 +377,33 @@ const setCameraFollow = () => {
   );
 };
 
+let touches: { point: THREE.Vector3; distance: number }[];
+const detectTouch = (box: any) => {
+  box.object.material.color.set("black");
+  touches.push({
+    point: box.point,
+    distance: box.distance,
+  });
+};
+const resetBoxes = () => {
+  obstacleMeshes.forEach((box: any) => {
+    box.material.color.set("red");
+  });
+  leftwallMesh.material.color.set("blue");
+  rightwallMesh.material.color.set("red");
+};
+const removeCar = () => {
+  vehicle.removeFromWorld(physicsWorld);
+  frame.scene.remove(boxMesh);
+  frame.scene.remove(sphereMesh1);
+  frame.scene.remove(sphereMesh2);
+  frame.scene.remove(sphereMesh3);
+  frame.scene.remove(sphereMesh4);
+  for (let i = 0; i < numberOfRays; i++) {
+    frame.scene.remove(raycasterLines[i]);
+  }
+};
+
 const animate = () => {
   physicsWorld.fixedStep();
 
@@ -381,20 +414,28 @@ const animate = () => {
   let intersects = [];
   for (let raycaster of raycasters) {
     intersects.push(
-      raycaster.intersectObjects(
-        [...obstacleMeshes, leftwallMesh, rightwallMesh],
-        true
-      )
+      raycaster.intersectObjects([
+        ...obstacleMeshes,
+        leftwallMesh,
+        rightwallMesh,
+      ])
     );
   }
+  touches = [];
   for (let intersect of intersects) {
     if (intersect.length > 0 && intersect[0].distance < rayLength) {
-      detectBox(intersect[0]); // Set the color of the selected box
+      detectTouch(intersect[0]); // Set the color of the selected box
     }
   }
 
   drawCar();
   updateRay();
+  isColliding();
+  // stop the loop when the car collides
+  if (isDamaged) {
+    console.log("Collision detected");
+    removeCar();
+  }
   setCameraFollow();
 
   for (let i = 0; i < obstacleCount; i++) {
@@ -402,6 +443,6 @@ const animate = () => {
     obstacleMeshes[i].quaternion.copy(obstacleBodies[i].quaternion as any);
   }
 
-  window.requestAnimationFrame(animate);
+  requestAnimationFrame(animate);
 };
 animate();
