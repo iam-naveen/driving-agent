@@ -15,24 +15,30 @@ frame.scene.add(axesHelper);
 const physicsWorld = new CANNON.World({
   gravity: new CANNON.Vec3(0, -9.8, 0),
 });
+physicsWorld.broadphase = new CANNON.SAPBroadphase(physicsWorld);
+physicsWorld.defaultContactMaterial.friction = 0.2;
+
+const groundMaterial = new CANNON.Material("groundMaterial");
+const wheelMaterial = new CANNON.Material("wheelMaterial");
+const wheelGroundContactMaterial = new CANNON.ContactMaterial(
+  wheelMaterial,
+  groundMaterial,
+  {
+    friction: 0.3,
+    restitution: 0,
+    contactEquationStiffness: 1000,
+  }
+);
+physicsWorld.addContactMaterial(wheelGroundContactMaterial);
 
 // create a ground body with a static plane
 const groundBody = new CANNON.Body({
+  mass: 0,
   type: CANNON.Body.STATIC,
   // infinte geometric plane
   shape: new CANNON.Plane(),
+  material: new CANNON.Material("groundMaterial"),
 });
-
-// contact material between the ground and the wheels
-const groundWheelContactMaterial = new CANNON.ContactMaterial(
-  new CANNON.Material("groundMaterial"),
-  new CANNON.Material("wheelMaterial"),
-  {
-    friction: 0.3,
-    restitution: 0.3,
-  }
-);
-physicsWorld.addContactMaterial(groundWheelContactMaterial);
 
 const leftWallBody = new CANNON.Body({
   type: CANNON.Body.STATIC,
@@ -60,7 +66,7 @@ const cannonDebugger = CannonDebugger(frame.scene, physicsWorld, {
 
 // add base vehicle body
 const carBody = new CANNON.Body({
-  mass: 10,
+  mass: 1,
   position: new CANNON.Vec3(0, 5, 0),
   shape: new CANNON.Box(new CANNON.Vec3(2, 0.5, 4)),
 });
@@ -73,7 +79,6 @@ const vehicle = new CANNON.RigidVehicle({
 const mass = 1;
 const axisWidth = 5;
 const wheelShape = new CANNON.Sphere(1);
-const wheelMaterial = new CANNON.Material("wheel");
 const down = new CANNON.Vec3(0, 0, -1);
 
 const wheelBody1 = new CANNON.Body({ mass: mass, material: wheelMaterial });
@@ -118,7 +123,7 @@ vehicle.addWheel({
 
 vehicle.addToWorld(physicsWorld);
 
-const maxSteerVal = Math.PI / 8;
+const maxSteerVal = Math.PI / 12;
 const maxForce = 30;
 
 // move car based on user input
@@ -184,8 +189,8 @@ document.addEventListener("keyup", (event) => {
 // MESH FOR GROUND
 const planeGeometry = new THREE.PlaneGeometry(100, 10000, 100, 10000);
 const planeMaterial = new THREE.MeshStandardMaterial({
-  wireframe: true,
-  color: "lime",
+  wireframe: false,
+  color: "gray",
 });
 const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
 frame.scene.add(planeMesh);
@@ -268,9 +273,9 @@ for (let i = 0; i < grid.length; i++) {
 
 const debug_enabled = true;
 
-const numberOfRays = 10;
+const numberOfRays = 50;
 const rayLength = 50;
-const raySpread = Math.PI / 2;
+const raySpread = 2 * Math.PI;
 // function lerp(a: number, b: number, t: number): number {
 //   return a * (b - a) * t;
 // }

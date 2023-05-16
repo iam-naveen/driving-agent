@@ -13,7 +13,7 @@ class NeuralNetwork {
       outputs = Level.feedForward(outputs, network.levels[i]);
     }
     return outputs;
-  } 
+  }
 }
 
 class Level {
@@ -47,10 +47,12 @@ class Level {
     }
   }
 
-  static activationFunciton(x: number, bias: number) {
-    return x > bias ? 1 : 0;
+  // function to quantify inputs to neurons
+  static activationFunciton(x: number) {
+    return x > 0 ? 1 : 0;
   }
 
+  // function to feed forward the inputs to the outputs
   static feedForward(givenInputs: number[], level: Level) {
     level.inputs = givenInputs;
     for (let i = 0; i < level.outputs.length; i++) {
@@ -59,7 +61,7 @@ class Level {
         sum += level.inputs[j] * level.weights[j][i];
       }
       sum += level.biases[i];
-      level.outputs[i] = Level.activationFunciton(sum, level.biases[i]);
+      level.outputs[i] = Level.activationFunciton(sum);
     }
     return level.outputs;
   }
