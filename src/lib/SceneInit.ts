@@ -29,8 +29,8 @@ export default class SceneInit {
       1,
       1000
     );
-    this.camera.position.z = 24;
-    this.camera.position.y = 8;
+    this.camera.position.z = 80;
+    this.camera.position.y = 150;
 
     // canvas which is already created in the HTML.
     const canvas = document.getElementById(this.canvasId) as HTMLCanvasElement;
@@ -39,7 +39,8 @@ export default class SceneInit {
       // smooth out the edges.
       antialias: true,
     });
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    // set the size of the canvas to be the size of the window.
+    this.renderer.setSize(window.innerWidth / 3, window.innerHeight / 3, false);
     // this.renderer.shadowMap.enabled = true;
     document.body.appendChild(this.renderer.domElement);
 
@@ -92,6 +93,6 @@ export default class SceneInit {
   onWindowResize() {
     this.camera.aspect = window.innerWidth / window.innerHeight;
     this.camera.updateProjectionMatrix();
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setSize(window.innerWidth / 3, window.innerHeight / 3, false);
   }
 }
