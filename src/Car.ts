@@ -164,7 +164,6 @@ export default class Car {
   update() {
     // console.table(this.controls);
     const speed = this.vehicle?.getWheelSpeed(0) as number;
-    // console.log(speed);
 
     if (this.controls.forward && speed > -this.speedLimit) {
       this.vehicle?.applyWheelForce(-this.maxForce, 0);
@@ -210,8 +209,9 @@ export default class Car {
     });
 
     const offsets = this.intersections.map((intersection) => {
-      return 1 - intersection.distance;
+      return 10 - intersection.distance;
     });
+    // console.log(offsets[25]);
     const outputs = NeuralNetwork.feedForward(offsets, this.brain);
     if (this.connectAI) {
       this.controls.forward = outputs[0] === 1;

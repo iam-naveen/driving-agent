@@ -1,30 +1,16 @@
-import "./style.css";
-import * as THREE from "three";
 import * as CANNON from "cannon-es";
 import CannonDebugger from "cannon-es-debugger";
-// import threejs GUI
-// import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
-
-import SceneInit from "./lib/SceneInit.js";
+import * as THREE from "three";
 import Car from "./Car";
 import NeuralNetwork from "./Network.js";
+import SceneInit from "./lib/SceneInit.js";
+import "./style.css";
 
 // set up Three.js scene with axis helper
 const frame = new SceneInit("canvas");
 frame.animate();
 const axesHelper = new THREE.AxesHelper(8);
 frame.scene.add(axesHelper);
-
-// const gui = new GUI();
-// const params = {
-//   mutationRate: 0.5,
-//   populationSize: 100,
-//   cameraAngle: 0,
-// };
-
-// gui.add(params, "mutationRate", 0, 1, 0.3);
-// gui.add(params, "populationSize", 1, 1000, 100);
-// gui.add(params, "cameraAngle", 0, 360, 1);
 
 // set up world physics with gravity
 const physicsWorld = new CANNON.World({
@@ -78,15 +64,17 @@ function generateCars(N: number): Car[] {
   return cars;
 }
 
-const cars = generateCars(2);
+const cars = generateCars(20);
 let bestCar = cars[0] as Car;
 if (localStorage.getItem("bestBrain")) {
   cars.forEach((car, i) => {
     car.brain = JSON.parse(localStorage.getItem("bestBrain") as string);
-    if (i != 0) NeuralNetwork.mutate(car.brain, 0.5);
+    if (i != 0) NeuralNetwork.mutate(car.brain, 0.3);
   });
   console.log("Previous best brain loaded", bestCar.brain);
 }
+
+// Brain Controls - Listeners
 window.addEventListener("keydown", (e) => {
   if (e.key == "b") {
     save(bestCar);
@@ -102,6 +90,7 @@ window.addEventListener("keydown", (e) => {
     console.log("downloaded");
   }
 });
+
 // MESH FOR GROUND
 const planeGeometry = new THREE.PlaneGeometry(100, 10000, 100, 10000);
 const planeMaterial = new THREE.MeshStandardMaterial({
@@ -129,7 +118,7 @@ const obstacleMeshes: THREE.Mesh[] = [];
 const obstacleBodies: CANNON.Body[] = [];
 // the grid for the layout of the obstacles
 const grid = [
-  [1, 0, 1, 0, 0, 1, 0, 0, 1],
+  [0, 1, 0, 0, 0, 1, 0, 0, 1],
   [1, 0, 1, 0, 1, 0, 1, 0, 1],
   [0, 1, 0, 1, 0, 0, 0, 1, 0],
 ];
@@ -137,7 +126,7 @@ const grid = [
 for (let i = 0; i < grid.length; i++) {
   for (let j = 0; j < grid[0].length; j++)
     if (grid[i][j] >= 1) {
-      const boxGeometry = new THREE.BoxGeometry(12, 2, 32);
+      const boxGeometry = new THREE.BoxGeometry(15, 2, 10);
       const boxMaterial = new THREE.MeshStandardMaterial({
         wireframe: false,
         color: "red",
@@ -145,13 +134,13 @@ for (let i = 0; i < grid.length; i++) {
       const boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
       const boxBody = new CANNON.Body({
         mass: 9000,
-        shape: new CANNON.Box(new CANNON.Vec3(6, 1, 16)),
+        shape: new CANNON.Box(new CANNON.Vec3(7.5, 1, 5)),
         position: new CANNON.Vec3(
           // set the boxes to any one of the three lanes
           i == 0 ? -20 : i == 1 ? 0 : 20,
           1,
           // set the boxes to random positions on the z axis
-          j * -100 - 50
+          j * -100 - 100
         ),
       });
       boxBody.collisionFilterGroup = 2;
@@ -200,8 +189,8 @@ function upload() {
 const setCameraFollow = (bestCar: Car) => {
   frame.camera.position.set(
     bestCar.bodyMesh?.position.x as number,
-    (bestCar.bodyMesh?.position.y as number) + 30,
-    (bestCar.bodyMesh?.position.z as number) + 50
+    (bestCar.bodyMesh?.position.y as number) + 150,
+    bestCar.bodyMesh?.position.z as number
   );
   frame.camera.lookAt(bestCar.bodyMesh?.position as THREE.Vector3);
 };
@@ -231,12 +220,14 @@ function animate() {
       car.remove();
     }
   });
+
   bestCar = cars.find(
     (car) =>
       car.body?.position.z ==
       Math.min(...cars.map((car) => car.body?.position.z as number))
   ) as Car;
-  // console.log(cars.length);
+
+  // console.log(bestCar.controls)
 
   planeMesh.position.copy(groundBody.position as any);
   planeMesh.quaternion.copy(groundBody.quaternion as any);

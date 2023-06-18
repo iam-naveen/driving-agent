@@ -4,9 +4,9 @@ export default class Sensor {
   scene: THREE.Scene;
   raycasters: THREE.Raycaster[] = [];
   raycasterLines: THREE.Line[] = [];
-  rayCount = 30;
-  raySpread = Math.PI / 3;
-  rayLength = 70;
+  rayCount = 80;
+  raySpread = Math.PI / 4;
+  rayLength = 50;
 
   constructor(scene: THREE.Scene, origin: THREE.Vector3) {
     this.scene = scene;
@@ -19,7 +19,7 @@ export default class Sensor {
         origin.clone().add(new THREE.Vector3(0, 0, -this.rayLength)), // Length of the raycaster
       ]);
       const raycasterMaterial = new THREE.LineBasicMaterial({
-        color: "red",
+        color: "lightgrey",
       });
       const raycasterLine = new THREE.Line(
         raycasterGeometry,

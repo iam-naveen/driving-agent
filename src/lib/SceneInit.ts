@@ -40,7 +40,7 @@ export default class SceneInit {
       antialias: true,
     });
     // set the size of the canvas to be the size of the window.
-    this.renderer.setSize(window.innerWidth / 3, window.innerHeight / 3, false);
+    this.renderer.setSize(window.innerWidth, window.innerHeight, false);
     // this.renderer.shadowMap.enabled = true;
     document.body.appendChild(this.renderer.domElement);
 
@@ -93,6 +93,6 @@ export default class SceneInit {
   onWindowResize() {
     this.camera.aspect = window.innerWidth / window.innerHeight;
     this.camera.updateProjectionMatrix();
-    this.renderer.setSize(window.innerWidth / 3, window.innerHeight / 3, false);
+    this.renderer.setSize(window.innerWidth, window.innerHeight, false);
   }
 }

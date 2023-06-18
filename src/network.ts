@@ -73,8 +73,8 @@ class Level {
   }
 
   // function to quantify inputs to neurons
-  static activationFunciton(x: number, bias: number) {
-    return x > bias ? 1 : 0;
+  static activationFunciton(x: number) {
+    return x > 0 ? 1 : 0;
   }
 
   // function to feed forward the inputs to the outputs
@@ -88,7 +88,7 @@ class Level {
       for (let j = 0; j < level.inputs.length; j++) {
         sum += level.inputs[j] * level.weights[j][i];
       }
-      level.outputs[i] = Level.activationFunciton(sum, level.biases[i]);
+      level.outputs[i] = Level.activationFunciton(sum + level.biases[i]);
     }
     return level.outputs;
   }
