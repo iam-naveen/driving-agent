@@ -1,7 +1,7 @@
 import * as CANNON from "cannon-es";
 import * as THREE from "three";
-import Sensor from "./Sensor";
-import NeuralNetwork from "./Network";
+import Sensor from "@/Sensor";
+import NeuralNetwork from "@/Network";
 
 export default class Car {
   body: CANNON.Body | undefined;
