@@ -205,6 +205,7 @@ export default class Car {
       this.obstacles as THREE.Mesh[]
     );
     this.intersections.forEach((box) => {
+      // @ts-ignore
       box.object.material.color.set("black");
     });
 
