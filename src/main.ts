@@ -53,6 +53,7 @@ physicsWorld.addBody(rightWallBody);
 // // add a green wireframe to each object and visualize the physics world
 const cannonDebugger = CannonDebugger(frame.scene, physicsWorld, {
   color: "lime",
+  // @ts-ignore
   autoUpdate: false,
 });
 
