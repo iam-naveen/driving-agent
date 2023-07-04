@@ -5,8 +5,14 @@ import { defineConfig } from "vite";
 export default defineConfig({
   resolve: {
     alias: [
-      { find: '@', replacement: fileURLToPath(new URL('./src', import.meta.url)) },
-      { find: '@lib', replacement: fileURLToPath(new URL('./src/lib', import.meta.url)) },
+      {
+        find: "@",
+        replacement: fileURLToPath(new URL("./src", import.meta.url)),
+      },
+      {
+        find: "@lib",
+        replacement: fileURLToPath(new URL("./src/lib", import.meta.url)),
+      },
     ],
   },
 });

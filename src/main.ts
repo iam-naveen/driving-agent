@@ -2,8 +2,8 @@ import * as CANNON from "cannon-es";
 import CannonDebugger from "cannon-es-debugger";
 import * as THREE from "three";
 import Car from "@/Car.js";
-import NeuralNetwork from "@/Network.js";
-import SceneInit from "@lib/SceneInit.js";
+import NeuralNetwork from "@/Network";
+import SceneInit from "@lib/SceneInit";
 import "@/style.css";
 
 // set up Three.js scene with axis helper
