@@ -2,7 +2,7 @@ import * as CANNON from "cannon-es";
 import CannonDebugger from "cannon-es-debugger";
 import * as THREE from "three";
 import Car from "@/Car.ts";
-import NeuralNetwork from "@/Network.ts";
+import NeuralNetwork from "@/NeuralNetwork";
 import SceneInit from "@lib/SceneInit.ts";
 import "@/style.css";
 
