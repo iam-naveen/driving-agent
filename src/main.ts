@@ -188,10 +188,11 @@ function upload() {
 }
 
 const setCameraFollow = (bestCar: Car) => {
+  // TODO: Add user control to adjust camera view
   frame.camera.position.set(
-    bestCar.bodyMesh?.position.x as number,
-    (bestCar.bodyMesh?.position.y as number) + 150,
-    bestCar.bodyMesh?.position.z as number
+    bestCar.bodyMesh?.position.x as number + 20,
+    (bestCar.bodyMesh?.position.y as number) + 40,
+    (bestCar.bodyMesh?.position.z as number) + 50
   );
   frame.camera.lookAt(bestCar.bodyMesh?.position as THREE.Vector3);
 };
